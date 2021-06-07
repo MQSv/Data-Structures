@@ -21,7 +21,7 @@ Stack createStack (unsigned stackSize) {
 }
 
 unsigned peek (Stack stack) {
-    return stack -> elements[stack -> top];
+    return stack -> elements[stack -> top - 1];
 }
 
 void push (Stack stack, unsigned element) {
