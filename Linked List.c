@@ -3,61 +3,82 @@
 #include<stdbool.h>
 
 struct LinkedListStruct {
-    struct LinkedListStruct* nextNode;
+    struct LinkedListStruct* next_node;
     int value;
 };
 
 typedef struct LinkedListStruct* LinkedList;
 
-LinkedList createLinkedList (int element) {
-    LinkedList newLinkedList = (LinkedList) malloc(sizeof(struct LinkedListStruct));
+LinkedList create_linked_list (int element) {
+    LinkedList new_linked_list = (LinkedList) malloc(sizeof(struct LinkedListStruct));
 
-    newLinkedList -> value = element;
-    newLinkedList -> nextNode = NULL;
+    new_linked_list -> value = element;
+    new_linked_list -> next_node = NULL;
 
-    return newLinkedList;
+    return new_linked_list;
 }
 
-LinkedList returnLastNode (LinkedList listRoot) {
-    while (listRoot -> nextNode != NULL) listRoot = listRoot -> nextNode;
+LinkedList return_last_node (LinkedList list_root) {
+    while (list_root -> next_node != NULL) list_root = list_root -> next_node;
 
-    return listRoot;
+    return list_root;
 }
 
-LinkedList iterateToLastNode (LinkedList listRoot, void (*voidFunction)(LinkedList)) {
-    do voidFunction(listRoot);
-    while ((listRoot = listRoot -> nextNode) != NULL);
+void link (LinkedList linker, LinkedList linked) { linker -> next_node = linked; }
+
+void print_element (LinkedList list) { printf("%d / ", list -> value); }
+
+void pop_connection (LinkedList list) {
+    list -> next_node = NULL;
+    free(list);
 }
 
-int takeElement (LinkedList list) { return list -> value; }
+int take_element (LinkedList list) { return list -> value; }
 
-void link (LinkedList linker, LinkedList linked) { linker -> nextNode = linked; }
+LinkedList create_by_vector (int* vector, unsigned vector_size) {
+    const LinkedList const root = create_linked_list(vector[0]);
+    LinkedList past_node = root;
 
-void printElement (LinkedList list) { printf("%d / ", list -> value); }
+    for (unsigned index = 1; index < vector_size; ++index) {
+        LinkedList new_node = create_linked_list(vector[index]);
+        link(past_node, new_node);
+        past_node = new_node;
+    }
 
-void popConnection (LinkedList list) { free(list); }
+    return root;
+}
 
-void freeList (LinkedList listNode) {
-    LinkedList nextNode;
+void iterate_to_last_node (LinkedList list_node, void (*void_function)(LinkedList)) {
+    LinkedList next_node;
 
     do {
-        nextNode = listNode -> nextNode;
-        free(listNode);
-    }
-    while ((listNode = nextNode) != NULL);
+        next_node = list_node -> next_node;
+        void_function(list_node);
+    } while ((list_node = next_node) != NULL);
 }
 
 int main (void) {
-    LinkedList rootLink = createLinkedList(10);
-    LinkedList link2 = createLinkedList(20);
-    LinkedList link3 = createLinkedList(30);
+    LinkedList root_link = create_linked_list(10),
+    link2 = create_linked_list(20),
+    link3 = create_linked_list(30);
 
-    link(rootLink, link2);
+    link(root_link, link2);
+
     //Connect link2 to link3;
-    link(returnLastNode(rootLink), link3);
+    link(return_last_node(root_link), link3);
 
-    iterateToLastNode(rootLink, printElement);
+    iterate_to_last_node(root_link, print_element);
 
-    freeList(rootLink);
+    int vector[5] = {1, 2, 3, 4, 5};
+
+    printf("\nCreated by vector: ");
+    LinkedList demo_list = create_by_vector(vector, 5);
+
+    iterate_to_last_node(demo_list, print_element);
+
+    //Freeing the lists;
+    iterate_to_last_node(demo_list, pop_connection);
+    iterate_to_last_node(root_link, pop_connection);
     return 0;
 }
+
